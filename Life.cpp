@@ -5,43 +5,43 @@
 #include <iostream>
 #include <thread>
 
-// Constructs the grid of size length and width, live cells are choosen from live_cells.
-Life::Life(int length, int width, std::vector<std::pair<int, int>> const & live_cells) : length_(length), width_(width) {
-    grid_.resize(length_, std::vector<int> (width_, 0));
+// Constructs the grid of size grid_length and grid_width, live cells are chosen from live_cells.
+Life::Life(int grid_length, int grid_width, std::vector<std::pair<int, int>> const & live_cells) : length(grid_length), width(grid_width) {
+    grid.resize(length, std::vector<int> (width, 0));
     for (std::pair<int, int> const & live_cell : live_cells) {
-        grid_[live_cell.first][live_cell.second] = 1;
+        grid[live_cell.first][live_cell.second] = 1;
     }
-    info_.resize(length_, std::vector<int> (width_, 0));
-    generation_ = 1;
-    population_ = 0;
-    for (int i = 0; i != length_; ++i) {
-        for (int j = 0; j != width_; ++j) {
-            population_ += grid_[i][j];
+    info.resize(length, std::vector<int> (width, 0));
+    generation = 1;
+    population = 0;
+    for (int i = 0; i != length; ++i) {
+        for (int j = 0; j != width; ++j) {
+            population += grid[i][j];
         }
     }
 }
 
-// Constructs the grid of size length and width, live cells are choosen randomly.
-Life::Life(int length, int width) : length_(length), width_(width) {
-    grid_.resize(length_, std::vector<int> (width_, 0));
-    for (int i = 0; i != length_; ++i) {
-        for (int j = 0; j != width_; ++j) {
-            grid_[i][j] = rand() % 2;
+// Constructs the grid of size grid_length and grid_width, live cells are chosen randomly.
+Life::Life(int grid_length, int grid_width) : length(grid_length), width(grid_width) {
+    grid.resize(length, std::vector<int> (width, 0));
+    for (int i = 0; i != length; ++i) {
+        for (int j = 0; j != width; ++j) {
+            grid[i][j] = rand() % 2;
         }
     }
-    info_.resize(length_, std::vector<int> (width_, 0));
-    generation_ = 1;
-    population_ = 0;
-    for (int i = 0; i != length_; ++i) {
-        for (int j = 0; j != width_; ++j) {
-            population_ += grid_[i][j];
+    info.resize(length, std::vector<int> (width, 0));
+    generation = 1;
+    population = 0;
+    for (int i = 0; i != length; ++i) {
+        for (int j = 0; j != width; ++j) {
+            population += grid[i][j];
         }
     }
 }
 
 // Updates the generation of cells until they remain.
 bool Life::update_generation() {
-    if (population_ == 0) {
+    if (population == 0) {
         return false;
     }
     update_info();
@@ -52,11 +52,11 @@ bool Life::update_generation() {
 // Clears the screen, prints the generation of cells and waits for a second.
 void Life::print_generation() const {
     system("cls");
-    std::cout << "Generation: " << generation_ << '\n';
-    std::cout << "Population: " << population_ << '\n';
-    for (int i = 0; i != length_; ++i) {
-        for (int j = 0; j != width_; ++j) {
-            if (grid_[i][j] == 0) {
+    std::cout << "Generation: " << generation << '\n';
+    std::cout << "Population: " << population << '\n';
+    for (int i = 0; i != length; ++i) {
+        for (int j = 0; j != width; ++j) {
+            if (grid[i][j] == 0) {
                 std::cout << ' ';
             } else {
                 std::cout << '*';
@@ -67,44 +67,39 @@ void Life::print_generation() const {
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
-// Helps iterate through all neighbors of a cell.
-std::vector<std::pair<int, int>> shifts = {
-    {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}  
-};
-
-// Checks whether the coordinates of the cell are valid.
-bool check_cell(int x, int y, int length, int width) {
-    return x >= 0 and x < length and y >= 0 and y < width;
-}
-
 // Updates the data about the neighbors of each cell.
 void Life::update_info() {
-    for (int i = 0; i != length_; ++i) {
-        for (int j = 0; j != width_; ++j) {
-            info_[i][j] = 0;
+    for (int i = 0; i != length; ++i) {
+        for (int j = 0; j != width; ++j) {
+            info[i][j] = 0;
             for (std::pair<int, int> const & shift : shifts) {
-                if (check_cell(i + shift.first, j + shift.second, length_, width_)) {
-                    info_[i][j] += grid_[i + shift.first][j + shift.second];
+                if (check_cell(i + shift.first, j + shift.second)) {
+                    info[i][j] += grid[i + shift.first][j + shift.second];
                 }
             }
         }
     }
 }
 
+// Checks whether the coordinates of the cell are valid.
+bool Life::check_cell(int x, int y) const {
+    return x >= 0 and x < length and y >= 0 and y < width;
+}
+
 // Updates the state of each cell based on its neighbors.
 void Life::update_grid() {
-    ++generation_;
-    for (int i = 0; i != length_; ++i) {
-        for (int j = 0; j != width_; ++j) {
-            if (grid_[i][j] == 0) {
-                if (info_[i][j] == 3) {
-                    grid_[i][j] = 1;
-                    ++population_;
+    ++generation;
+    for (int i = 0; i != length; ++i) {
+        for (int j = 0; j != width; ++j) {
+            if (grid[i][j] == 0) {
+                if (info[i][j] == 3) {
+                    grid[i][j] = 1;
+                    ++population;
                 }
             } else {
-                if (info_[i][j] < 2 or info_[i][j] > 3) {
-                    grid_[i][j] = 0;
-                    --population_;
+                if (info[i][j] < 2 or info[i][j] > 3) {
+                    grid[i][j] = 0;
+                    --population;
                 }
             }
         }
