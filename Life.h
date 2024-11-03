@@ -10,7 +10,7 @@ public:
     // Constructs the grid of size grid_length and grid_width, live cells are chosen randomly.
     Life(int grid_length, int grid_width);
 
-    // Updates the generation of cells until they remain.
+    // Updates the generation of cells while they remain.
     bool update_generation();
 
     // Clears the screen, prints the generation of cells and waits for a second.
@@ -22,7 +22,7 @@ private:
     // Disables assignment operator for our class.
     Life & operator = (Life const & other);
 
-    // Updates the data about the neighbors of each cell.
+    // Updates the data about neighbors of each cell.
     void update_info();
 
     // Checks whether the coordinates of the cell are valid.
