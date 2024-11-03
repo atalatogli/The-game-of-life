@@ -39,7 +39,7 @@ Life::Life(int grid_length, int grid_width) : length(grid_length), width(grid_wi
     }
 }
 
-// Updates the generation of cells until they remain.
+// Updates the generation of cells while they remain.
 bool Life::update_generation() {
     if (population == 0) {
         return false;
@@ -67,7 +67,7 @@ void Life::print_generation() const {
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
-// Updates the data about the neighbors of each cell.
+// Updates the data about neighbors of each cell.
 void Life::update_info() {
     for (int i = 0; i != length; ++i) {
         for (int j = 0; j != width; ++j) {
